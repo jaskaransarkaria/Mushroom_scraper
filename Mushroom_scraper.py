@@ -5,6 +5,7 @@ import urllib
 from urllib.request import urlopen, Request
 from bs4 import BeautifulSoup
 from selenium import webdriver
+import re
 
 print("Welcome to Mushroom:bot")
 print("Our mushroom guide is not a comprehensive guide of UK mushrooms.")
@@ -25,17 +26,16 @@ def make_soup(url):
 
 def click_link(old_link, new_link): #function to click relevant page
 
-    driver = webdriver.Firefox()
+    driver = webdriver.Chrome()
     driver.get(old_link)
     elem1 = driver.find_element_by_link_text(new_link)
-    elem1 = elem1.click()
-    print(get_text(elem1))
+    elem1.click()
 
 
 soup = make_soup("http://www.foragingguide.com/mushrooms/edible_by_common_name")
 edible_list = []
 for mushroom_edible in soup.find_all(class_="list_div"):
-    edible_list.append(mushroom_edible)
+    edible_list.append(mushroom_edible.text)
     print(mushroom_edible.text)
 
 print()
@@ -47,7 +47,7 @@ print()
 soup2 = make_soup("http://www.foragingguide.com/mushrooms/poisonous_by_common_name")
 poisonous_list = []
 for mushroom_poisonous in soup2.find_all(class_="list_div"):
-    poisonous_list.append(mushroom_poisonous)
+    poisonous_list.append(mushroom_poisonous.text)
     print(mushroom_poisonous.text)
 
 print()
@@ -57,14 +57,14 @@ print()
 print()
 
 mush_choice = input("Choose a mushroom you would like to know a little more about:").title()
-
 print()
 print()
 print()
 print()
 print()
 
-if mush_choice in edible_list:
+if any(mush_choice in s for s in edible_list):
     click_link("http://www.foragingguide.com/mushrooms/edible_by_common_name", mush_choice)
-elif mush_choice in poisonous_list:
+
+elif any(mush_choice in s for s in poisonous_list):
     click_link("http://www.foragingguide.com/mushrooms/poisonous_by_common_name", mush_choice)
