@@ -17,8 +17,8 @@ from selenium.webdriver.support import expected_conditions
 print("Welcome to Mushroom:bot")
 print("Our mushroom guide is not a comprehensive guide of UK mushrooms.")
 print("There are roughly 15,000 types of wild fungi in the UK;")
-print("This is a quickly narrow down the possibities of what you might have")
-print("Use mutliple sources to identify your mushrooms, don't blame me for anything.")
+print("This is a quickly narrow down the possibilities of what you might have")
+print("Use multiple sources to identify your mushrooms, don't blame me if you die.")
 print()
 print()
 print()
@@ -31,8 +31,17 @@ def make_soup(url):
     soupdata = BeautifulSoup(thepage, 'html.parser')
     return soupdata
 
-def click_link(old_link, new_link): #function to click relevant page
+def pretty_print(text):
 
+    text = text.split("related species »")[-1]
+    text = text.split("660){")[0]
+    text = text.split("(adsbygoogle")[0]
+    text = re.sub("JanFebMarAprMayJunJulAugSepOctNovDec", '', text)
+    text = re.sub("Season", '', text)
+    print(text.strip())
+
+
+def click_link(old_link, new_link): #function to click relevant page
 
     driver = webdriver.Chrome()
     driver.get(old_link)
@@ -41,11 +50,8 @@ def click_link(old_link, new_link): #function to click relevant page
     current_url = driver.current_url
     driver.implicitly_wait(60) #60 seconds
     soup3 = make_soup(current_url)
-    print(soup3.get_text())
-
-
-
-
+    soup3 = soup3.get_text()
+    pretty_print(soup3)
 
 
 soup = make_soup("http://www.foragingguide.com/mushrooms/edible_by_common_name")
@@ -81,7 +87,6 @@ print()
 
 if any(mush_choice in s for s in edible_list):
     click_link("http://www.foragingguide.com/mushrooms/edible_by_common_name", mush_choice)
-
 
 elif any(mush_choice in s for s in poisonous_list):
     click_link("http://www.foragingguide.com/mushrooms/poisonous_by_common_name", mush_choice)
