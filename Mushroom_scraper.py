@@ -5,17 +5,7 @@ import urllib
 from urllib.request import urlopen, Request
 from bs4 import BeautifulSoup
 from selenium import webdriver
-from selenium.webdriver import ActionChains
-from selenium.webdriver.common.keys import Keys
 import re
-import glob
-
-'''
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions
-    delay = 20  # seconds
-    WebDriverWait(driver, delay).until(expected_conditions.get_text())
-'''
 
 
 print("Welcome to Mushroom:bot")
@@ -42,6 +32,7 @@ def pretty_print(text):
     text = text.split("(adsbygoogle")[0]
     text = re.sub("JanFebMarAprMayJunJulAugSepOctNovDec", '', text)
     text = re.sub("Season", '', text)
+    text = re.sub(r'(\w*:)',r'\r\n\1', text)
     print(text.strip())
 
 
@@ -56,29 +47,16 @@ def click_link(old_link, new_link): #function to click relevant page
     driver.implicitly_wait(60) #60 seconds
     soup3 = make_soup(current_url)
     soup5 = soup3.get_text()
+    elem2 = driver.find_elements_by_class_name("img_thumb") #returns a list
 
-    #Download each image on the page
-
-    actions = ActionChains(driver)                      #open .jpg in new window then download it
-    elem2 = driver.find_elements_by_tag_name("img")
-    print(elem2)
 
     for e in elem2:
-        main_window = driver.current_window_handle
-        actions.key_down(Keys.CONTROL).click(e).key_up(Keys.CONTROL).perform()
-        driver.switch_to.window(driver.window_handles[0])
-        driver.implicitly_wait(60)
 
-        current_url2 = driver.current_url
-        filename = current_url2.split('/')[-1]
-
-        make_soup(current_url2)
-        urllib.request.urlretrieve(current_url2, filename + ".jpg")   #downloads each e
-
-        driver.find_element_by_tag_name('body').send_keys(Keys.CONTROL + 'w')
-    images = glob.glob("*.jpg")
-    for image in images:                                 #open each file that has been saved
-        open(image, 'rb')
+        image_src = e.get_attribute("src")
+        print(image_src)
+        driver.implicitly_wait(10)
+        filename = image_src.split('/')[-1]
+        urllib.request.urlretrieve(image_src, filename)   #downloads each e
 
     pretty_print(soup5)
 
